@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主界面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: #e3ecfb;
+            padding: 20px 0;
+        }
+        .sidebar {
+            width: 250px;
+            background: #e3ecfb;
+            padding: 20px;
+        }
+        .sidebar ul {
+            list-style: none;
+        }
+        .sidebar ul li {
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 15px;
+        }
+        .sidebar ul li:hover,.sidebar ul li.active {
+            background: #d0d8f0;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            max-width: 80%;
+            position: relative;
+        }
+        /* 美化上传区域 */
+        .upload-section {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+        }
+        /* 隐藏原生 input[type=file] */
+        .upload-section input {
+            display: none;
+        }
+        /* 自定义的文件上传按钮 */
+        .custom-file-label {
+            padding: 8px 15px;
+            background-color: #4a90e2;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            display: inline-block;
+        }
+        .custom-file-label:hover {
+            background-color: #357abd;
+        }
+        /* 上传按钮 */
+        .upload-section button {
+            padding: 8px 15px;
+            background-color: #357abd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .upload-section button:hover {
+            background-color: #2d6ca2;
+        }
+        /* 文件列表 */
+        .file-list {
+            margin-top: 70px;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+        .file-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .file-list li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <ul>
+            <li onclick="changeContent('recent')" class="active">最近上传</li>
+            <li onclick="changeContent('myFiles')">历史记录</li>
+            <li onclick="changeContent('favorites')">收藏文件</li>
+            <li onclick="changeContent('recycle')">回收站</li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="upload-section">
+            <label for="fileInput" class="custom-file-label">选择文件</label>
+            <input type="file" id="fileInput">
+            <button onclick="uploadFile()">上传</button>
+        </div>
+        <div class="file-list" id="content-area">
+            <h3>上传的文件</h3>
+            <ul id="fileList">
+                <!-- 上传的文件将在这里显示 -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function changeContent(section){
+            let contentArea = document.getElementById("content-area");
+            let sidebarItems = document.querySelectorAll(".sidebar ul li");
+            sidebarItems.forEach(item => item.classList.remove("active"));
+            if (section === "recent") {
+                contentArea.innerHTML = `<h3>最近文件</h3><p>这里显示最近上传的文件列表。</p>`;
+            } else if (section === "myFiles") {
+                contentArea.innerHTML = `<h3>我的文件</h3><p>这里显示你所有的个人文件。</p>`;
+            } else if (section === "favorites") {
+                contentArea.innerHTML = `<h3>收藏文件</h3><p>这里显示你收藏的文件。</p>`;
+            } else if (section === "recycle") {
+                contentArea.innerHTML = `<h3>回收站</h3><p>这里存放被删除的文件，可以选择恢复或彻底删除。</p>`;
+            }
+            event.target.classList.add("active")
+        }
+        function uploadFile() {
+            let fileInput = document.getElementById("fileInput");
+            let fileList = document.getElementById("fileList");
+
+            if (fileInput.files.length === 0) {
+                alert("请选择一个文件！");
+                return;
+            }
+
+            let file = fileInput.files[0];
+            let listItem = document.createElement("li");
+            listItem.textContent = file.name;
+            fileList.appendChild(listItem);
+
+            fileInput.value = ""; // 清空输入框
+        }
+    </script>
+</body>
+</html>

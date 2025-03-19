@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频编辑页面</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { display: flex; flex-direction: column; height: 100vh; font-family: Arial, sans-serif; }
+        .container { display: flex; flex: 3; }
+        .nav { width: 200px; background-color: #333; color: white; padding: 20px; }
+        .nav button { display: block; margin-bottom: 10px; width: 100%; padding: 10px; cursor: pointer; }
+        .content { display: flex; flex: 1; padding: 20px; }
+        .content-left { flex: 1; background-color: #f4f4f4; padding: 20px; margin-right: 10px; }
+        .content-right { flex: 1.5; background-color: #ddd; padding: 20px; display: flex; align-items: center; justify-content: center; }
+        video { width: 100%; max-height: 100%; }
+        
+        /* 美化底部区域 */
+        .footer { 
+            flex: 1; background-color: #222; color: white; padding: 15px;
+            display: flex; flex-direction: column; align-items: center; position: relative;; 
+        }
+        
+        .timeline-container {
+            position: relative;
+            width: 90%;
+            margin: 0 auto;
+            height: 100px;
+            background-color: #333;
+            border-radius: 5px;
+            top: 40%;
+        }
+
+        .track {
+            position: absolute;
+            /* top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0; */
+            height: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            /* background-color: aqua; */
+            /* margin-top: 5px; */
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .segment {
+            background-color: #ff9800; /* 片段的颜色 */
+            height: 100%;
+            border-radius: 5px;
+            cursor: grab;
+            position: absolute;
+            z-index: 10;
+        }
+        .segment:active{
+            cursor: grabbing;
+        }
+        .resize-handle{
+            position: absolute;
+            width: 8px;
+            height: 100%;
+            background-color: #ddd;
+            cursor: ew-resize;
+            z-index: 20;
+        }
+        .resize-handle.left{ left: 0;}
+        .resize-handle.right{ right: 0;}
+
+        input[type="range"] {
+            position: absolute;
+            width: 100%;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            background: transparent;
+            -webkit-appearance: none;
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 6px;
+            border-radius: 3px;
+            background: transparent;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #ddd;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .current-time-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: red;
+            transform: translateX(-50%);
+            transition: left 0.1s ease-out;
+            z-index: 100;
+        }
+
+
+        /* 控制按钮区域 */
+        .controls {
+            display: flex; 
+            justify-content: center; 
+            /* 按钮居中 */
+            width: 90%;
+            position: absolute;
+            top: 10px;
+            align-items: center;
+        }
+        .controls button, .controls select {
+            padding: 8px 15px; 
+            border: none; 
+            border-radius: 50%; 
+            background: #444; 
+            color: white; 
+            cursor: pointer; 
+            transition: 0.3s;
+        }
+        .controls span{
+            color: white;
+            font-size: 14px;
+            margin: 0 15px;
+            min-width: 15px;
+            text-align: center;
+            /* background-color: aqua; */
+        }
+        .controls button:hover, .controls select:hover {
+            background: #666;
+        }
+
+        /* 音量和倍速按钮放在左上角 */
+        .volume-speed-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 90%;
+            position: absolute;
+            top: 20px;
+            
+        }
+        #volumeControl {
+            width: 80px; /* 缩小音量调节滑动条 */
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <nav class="nav">
+            <button onclick="changeContent('字幕文本')">字幕</button>
+            <button onclick="changeContent('选项2内容')">选项2</button>
+            <button onclick="changeContent('选项3内容')">选项3</button>
+        </nav>
+        <div class="content">
+            <div class="content-left" id="left-content">字幕文本</div>
+            <div class="content-right">
+                <video id="video">
+                    <source src="./[Meowskers][Shadowverse Flame][77][1080P][CHS].mp4" type="video/mp4">
+                    您的浏览器不支持 HTML5 视频
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <!-- 音量和倍速按钮区域 -->
+        <!-- <div class="volume-speed-container">
+            <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1">
+            <select id="speedControl">
+                <option value="0.5">0.5x</option>
+                <option value="1" selected>1x</option>
+                <option value="1.5">1.5x</option>
+                <option value="2">2x</option>
+            </select>
+        </div> -->
+
+        <!-- 播放按钮 -->
+        <div class="controls">
+            <span id="currentTime">00:00</span>
+            <button id="playPauseBtn">▶</button>
+            <span id="totalTime">--:--</span>
+        </div>
+
+        <!-- 进度条 -->
+        <!-- <div class="timeline-container">
+            <input type="range" id="timeline" min="0" value="0">
+        </div> -->
+        <div class="timeline-container">
+            <div class="track">
+                <div class="segment" style=" left: 20%; width: 30%;">
+                    <div class="resize-handle left"></div>
+                    <div class="resize-handle right"></div>
+                </div>
+                <div class="segment" style="left:60%; width: 15%;">
+                    <div class="resize-handle left"></div>
+                    <div class="resize-handle right"></div>
+                </div>
+                <!-- <div class="segment" style="width: 20%;"></div> -->
+            </div>
+            <input type="range" id="timeline" min="0" value="0" />
+            <div class="current-time-indicator"></div>
+        </div>
+        
+    </footer>
+
+    <script>
+        const video = document.getElementById("video");
+        const timeline = document.getElementById("timeline");
+        const playPauseBtn = document.getElementById("playPauseBtn");
+        const speedControl = document.getElementById("speedControl");
+        const volumeControl = document.getElementById("volumeControl");
+        const currentTimeDisplay = document.getElementById("currentTime");
+        const totalTimeDisplay = document.getElementById("totalTime");
+        const currentTimeIndicator = document.querySelector(".current-time-indicator");
+        const timelineContainer = document.getElementById("timeline-container");
+
+        //格式化时间
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+        }
+        // 初始化视频时间轴&设置总时长
+        video.addEventListener("loadedmetadata", () => {
+            timeline.max = video.duration;
+            totalTimeDisplay.textContent = formatTime(video.duration);
+        });
+
+        // 拖动进度条，调整视频进度
+        timeline.addEventListener("input", () => {
+            video.currentTime = timeline.value;
+        });
+
+        // 视频播放时，实时更新进度条&当前时间
+        video.addEventListener("timeupdate", () => {
+            timeline.value = video.currentTime;
+            currentTimeDisplay.textContent = formatTime(video.currentTime)
+            currentTimeIndicator.style.left = `${(video.currentTime / video.duration) * 100}%`;
+        });
+        
+
+        // 播放 / 暂停 按钮
+        playPauseBtn.addEventListener("click", () => {
+            if (video.paused) {
+                video.play();
+                playPauseBtn.textContent = "⏸";
+            } else {
+                video.pause();
+                playPauseBtn.textContent = "▶";
+            }
+        });
+        document.querySelectorAll(".segment").forEach(segment => {
+            let isDragging = false;
+            let isResizing = false;
+            let startX, startLeft, startWidth;
+            let track = segment.parentElement;
+
+            // 获取所有 segments
+            function getSegments() {
+                return Array.from(track.querySelectorAll(".segment")).sort((a, b) => 
+                    parseFloat(a.style.left) - parseFloat(b.style.left)
+                );
+            }
+
+            // 防止 segment 重叠
+            function checkOverlap(segment, newLeft, newWidth) {
+                let segments = getSegments();
+                let index = segments.indexOf(segment);
+                let prevSegment = segments[index - 1];
+                let nextSegment = segments[index + 1];
+
+                if (prevSegment) {
+                    let prevEnd = parseFloat(prevSegment.style.left) + parseFloat(prevSegment.style.width);
+                    if (newLeft < prevEnd) return false;
+                }
+                if (nextSegment) {
+                    let nextStart = parseFloat(nextSegment.style.left);
+                    if (newLeft + newWidth > nextStart) return false;
+                }
+                return true;
+            }
+
+            // 拖拽 segment 移动
+            segment.addEventListener("mousedown", (e) => {
+                if (e.target.classList.contains("resize-handle")) return;
+                isDragging = true;
+                startX = e.clientX;
+                startLeft = parseFloat(segment.style.left);
+                segment.style.cursor = "grabbing";
+            });
+
+            document.addEventListener("mousemove", (e) => {
+                if (!isDragging) return;
+                let deltaX = e.clientX - startX;
+                let newLeft = startLeft + (deltaX / track.offsetWidth) * 100;
+                newLeft = Math.max(0, Math.min(100 - parseFloat(segment.style.width), newLeft));
+
+                // 防止重叠
+                if (checkOverlap(segment, newLeft, parseFloat(segment.style.width))) {
+                    segment.style.left = `${newLeft}%`;
+                }
+            });
+
+            document.addEventListener("mouseup", () => {
+                isDragging = false;
+                segment.style.cursor = "grab";
+            });
+
+            // 处理调整大小
+            segment.querySelectorAll(".resize-handle").forEach(handle => {
+                handle.addEventListener("mousedown", (e) => {
+                    isResizing = true;
+                    startX = e.clientX;
+                    startWidth = parseFloat(segment.style.width);
+                    startLeft = parseFloat(segment.style.left);
+                    segment.classList.add("resizing");
+                    e.stopPropagation(); 
+                });
+
+                document.addEventListener("mousemove", (e) => {
+                    if (!isResizing) return;
+                    let deltaX = e.clientX - startX;
+                    let newWidth = startWidth + (deltaX / track.offsetWidth) * 100;
+                    let newLeft = startLeft;
+
+                    if (handle.classList.contains("left")) {
+                        newWidth = startWidth - (deltaX / track.offsetWidth) * 100;
+                        newLeft = startLeft + (deltaX / track.offsetWidth) * 100;
+                    }
+
+                    newWidth = Math.max(5, Math.min(100 - newLeft, newWidth));
+
+                    // 防止重叠
+                    if (checkOverlap(segment, newLeft, newWidth)) {
+                        segment.style.width = `${newWidth}%`;
+                        segment.style.left = `${newLeft}%`;
+                    }
+                });
+
+                document.addEventListener("mouseup", () => {
+                    isResizing = false;
+                    segment.classList.remove("resizing");
+                });
+            });
+        });
+
+
+
+        // 倍速调节
+        speedControl.addEventListener("change", () => {
+            video.playbackRate = speedControl.value;
+        });
+
+        // 音量调节
+        volumeControl.addEventListener("input", () => {
+            video.volume = volumeControl.value;
+        });
+
+        // 切换左侧内容
+        function changeContent(text) {
+            document.getElementById("left-content").innerText = text;
+        }
+    </script>
+
+</body>
+</html>
