@@ -21,16 +21,22 @@
             width: 250px;
             background: #e3ecfb;
             padding: 20px;
+            /* margin-top: 10%; */
         }
         .sidebar ul {
             list-style: none;
+        }
+        h2{
+            padding: 5px;
+            font-style: oblique;
+            margin-bottom: 10px;
         }
         .sidebar ul li {
             padding: 15px;
             cursor: pointer;
             border-radius: 15px;
         }
-        .sidebar ul li:hover,.sidebar ul li.active {
+        .sidebar ul li:hover, .sidebar ul li.active {
             background: #d0d8f0;
         }
         .main-content {
@@ -45,6 +51,35 @@
             max-width: 80%;
             position: relative;
         }
+        /* 右上角的按钮样式 */
+        .auth-section {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .auth-section button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+        .login-btn {
+            background-color: #4a90e2;
+            margin-right: 10px;
+        }
+        .login-btn:hover {
+            background-color: #357abd;
+        }
+        .register-btn {
+            background-color: #7f8cdd;
+        }
+        .register-btn:hover {
+            background-color: #6675c7;
+        }
         /* 美化上传区域 */
         .upload-section {
             position: absolute;
@@ -53,11 +88,12 @@
             display: flex;
             align-items: center;
         }
-        /* 隐藏原生 input[type=file] */
-        .upload-section input {
+        /* .upload-section input {
             display: none;
-        }
-        /* 自定义的文件上传按钮 */
+        } */
+         #fileInput{
+            display: none;
+         }
         .custom-file-label {
             padding: 8px 15px;
             background-color: #4a90e2;
@@ -70,7 +106,6 @@
         .custom-file-label:hover {
             background-color: #357abd;
         }
-        /* 上传按钮 */
         .upload-section button {
             padding: 8px 15px;
             background-color: #357abd;
@@ -82,7 +117,23 @@
         .upload-section button:hover {
             background-color: #2d6ca2;
         }
-        /* 文件列表 */
+        .search-box {
+            padding: 8px 12px;
+            border: 1px solid #d0d8f0;
+            border-radius: 5px;
+            background-color: #f0f4fa;
+            color: #333333;
+            outline: none;
+            width: 200px;
+            margin-left: 10px;
+        }
+        .search-box::placeholder {
+            color: #888888;
+        }
+        .search-box:focus {
+            border-color: #4a90e2;
+        }
+
         .file-list {
             margin-top: 70px;
             padding: 10px;
@@ -96,63 +147,167 @@
             padding: 10px;
             border-bottom: 1px solid #ddd;
         }
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .file-item .file-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .file-item .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-info span {
+            background: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .file-info .action {
+            color: #4a90e2;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .file-info .action:hover {
+            color: #357abd;
+        }
+
     </style>
 </head>
 <body>
     <div class="sidebar">
         <ul>
-            <li onclick="changeContent('recent')" class="active">最近上传</li>
+            <h2>沪语视频字幕生成</h2>
+            <li onclick="changeContent('recent')" class="active">我的文件</li>
             <li onclick="changeContent('myFiles')">历史记录</li>
             <li onclick="changeContent('favorites')">收藏文件</li>
             <li onclick="changeContent('recycle')">回收站</li>
         </ul>
     </div>
     <div class="main-content">
+        <div class="auth-section">
+            <!-- 登录和注册按钮 -->
+            <div id="auth-buttons">
+                <button class="login-btn" onclick="location.href='./login.html'">登录</button>
+                <button class="register-btn" onclick="location.href='./register.html'">注册</button>
+            </div>
+            <div id="user-info" style="display: none; font-weight: bold;"></div>
+        </div>
+
         <div class="upload-section">
             <label for="fileInput" class="custom-file-label">选择文件</label>
-            <input type="file" id="fileInput">
-            <button onclick="uploadFile()">上传</button>
+            <input type="file" id="fileInput"  onchange="uploadFile()">
+            <!-- <button onclick="uploadFile()">上传</button> -->
+            <input type="text" class="search-box" placeholder="搜索文件...">
         </div>
         <div class="file-list" id="content-area">
-            <h3>上传的文件</h3>
-            <ul id="fileList">
-                <!-- 上传的文件将在这里显示 -->
-            </ul>
+            <!-- <h3>我的文件</h3>
+            <p>这里显示最近上传的文件列表。</p> -->
+            <ul id="fileList"></ul>
         </div>
     </div>
 
     <script>
-        function changeContent(section){
+        function changeContent(section) {
             let contentArea = document.getElementById("content-area");
             let sidebarItems = document.querySelectorAll(".sidebar ul li");
-            sidebarItems.forEach(item => item.classList.remove("active"));
-            if (section === "recent") {
-                contentArea.innerHTML = `<h3>最近文件</h3><p>这里显示最近上传的文件列表。</p>`;
-            } else if (section === "myFiles") {
-                contentArea.innerHTML = `<h3>我的文件</h3><p>这里显示你所有的个人文件。</p>`;
-            } else if (section === "favorites") {
-                contentArea.innerHTML = `<h3>收藏文件</h3><p>这里显示你收藏的文件。</p>`;
-            } else if (section === "recycle") {
-                contentArea.innerHTML = `<h3>回收站</h3><p>这里存放被删除的文件，可以选择恢复或彻底删除。</p>`;
+            
+            if(!isLoggedIn){
+                contentArea.innerHTML='<h3>请登录后查看内容</h3><p>您需要登录才能访问文件列表</p>'
+                return;
             }
-            event.target.classList.add("active")
+            sidebarItems.forEach(item => item.classList.remove("active"));
+
+            if (section === "recent") {
+                contentArea.innerHTML = `<h3>我的文件</h3><p>这里显示最近上传的文件列表。</p><ul id="fileList"></ul>`;
+            } else if (section === "myFiles") {
+                contentArea.innerHTML = `<h3>历史记录</h3><p>这里显示你上传过的文件。</p><ul id="fileList"></ul>`;
+            } else if (section === "favorites") {
+                contentArea.innerHTML = `<h3>收藏文件</h3><p>这里显示你收藏的文件。</p><ul id="fileList"></ul>`;
+            } else if (section === "recycle") {
+                contentArea.innerHTML = `<h3>回收站</h3><p>这里存放被删除的文件，可以选择恢复或彻底删除。</p><ul id="fileList"></ul>`;
+            }
+
+            event.target.classList.add("active");
         }
+
         function uploadFile() {
             let fileInput = document.getElementById("fileInput");
             let fileList = document.getElementById("fileList");
+            if(!fileList){
+                console.error("错误");
+                return;
+            }
 
             if (fileInput.files.length === 0) {
-                alert("请选择一个文件！");
+                // alert("请选择一个文件！");
                 return;
             }
 
             let file = fileInput.files[0];
+            let now = new Date();
+            let timeString = now.getFullYear()+"/"+(now.getMonth()+1)+"/"+now.getDate()+" "+now.getHours()+":"+now.getMinutes();
+            let fileSize = file.size < 1024*1024 ? (file.size/1024).toFixed(2)+"KB" : (file.size/(1024*1024)).toFixed(2)+"MB";
             let listItem = document.createElement("li");
-            listItem.textContent = file.name;
-            fileList.appendChild(listItem);
+            // listItem.textContent = file.name;
+            // fileList.appendChild(listItem);
 
-            fileInput.value = ""; // 清空输入框
+            // fileInput.value = ""; 
+            listItem.classList.add("file-item");
+
+            listItem.innerHTML=`
+                <div class="file-info">
+                    <strong>${file.name}</strong> <span>${fileSize}</span> <span>${timeString}</span>    
+                </div>
+                <div class="file-actions">
+                    <button class="delete-btn" onclick="deleteFile(this)">删除</button>
+                </div>
+            `;
+            fileList.appendChild(listItem);
+            fileInput.value="";
         }
+        function deleteFile(button){
+            let listItem=button.closest("li");
+            listItem.remove();
+        }
+        // 模拟用户登录状态
+        let isLoggedIn = true; // true 表示已登录，false 表示未登录
+        let username = "小明";  // 假设登录后会有用户名
+
+        function updateUserUI() {
+            let authButtons = document.getElementById("auth-buttons"); // 登录/注册按钮
+            let userInfo = document.getElementById("user-info"); // 显示用户名的区域
+            let contentArea = document.getElementById("content-area");
+
+            if (isLoggedIn) {
+                authButtons.style.display = "none"; // 隐藏登录/注册
+                userInfo.innerHTML = `<h2>欢迎，${username}</h2>`;
+                userInfo.style.display = "block"; // 显示用户名
+                contentArea.innerHTML = `<h3>我的文件</h3><p>这里显示最近上传的文件列表。</p><ul id="fileList"></ul>`;
+            } else {
+                authButtons.style.display = "flex"; // 显示登录/注册
+                userInfo.style.display = "none"; // 隐藏用户名
+                contentArea.innerHTML='<h3>请登录后查看内容</h3><p>您需要登录才能访问文件列表</p>'
+            }
+        }
+
+        // 初始检查
+        updateUserUI();
+
     </script>
 </body>
 </html>
