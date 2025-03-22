@@ -202,8 +202,8 @@
         <div class="auth-section">
             <!-- 登录和注册按钮 -->
             <div id="auth-buttons">
-                <button class="login-btn" onclick="location.href='./login.html'">登录</button>
-                <button class="register-btn" onclick="location.href='./register.html'">注册</button>
+                <button class="login-btn" onclick="location.href='./login'">登录</button>
+                <button class="register-btn" onclick="location.href='./register'">注册</button>
             </div>
             <div id="user-info" style="display: none; font-weight: bold;"></div>
         </div>
@@ -285,7 +285,7 @@
             listItem.remove();
         }
         // 模拟用户登录状态
-        let isLoggedIn = true; // true 表示已登录，false 表示未登录
+        let isLoggedIn = false; // true 表示已登录，false 表示未登录
         let username = "小明";  // 假设登录后会有用户名
 
         function updateUserUI() {
