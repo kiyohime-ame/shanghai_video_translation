@@ -288,11 +288,12 @@
             let authButtons = document.getElementById("auth-buttons"); // 登录/注册按钮
             let userInfo = document.getElementById("user-info"); // 显示用户名的区域
             let contentArea = document.getElementById("content-area");
+            let isLoggedIn = false;
 
             if (flag==="Success"){
-                let isLoggedIn = true;
+                isLoggedIn = true;
             }else{
-                let isLoggedIn = false;
+                isLoggedIn = false;
             }
             if (isLoggedIn) {
                 authButtons.style.display = "none"; // 隐藏登录/注册
