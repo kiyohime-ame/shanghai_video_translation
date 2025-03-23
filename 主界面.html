@@ -220,8 +220,8 @@
     </div>
 
     <script>
-        const flag = localStorage.getItem("flag");
-        const username = localStorage.getItem("username");
+        const flag = sessionStorage.getItem("flag");
+        const username = sessionStorage.getItem("username");
         function changeContent(section) {
             let contentArea = document.getElementById("content-area");
             let sidebarItems = document.querySelectorAll(".sidebar ul li");

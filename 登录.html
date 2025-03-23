@@ -247,8 +247,8 @@
                 .then(data=>{
                     if(data.flag==="Success"){
                         alert("登录成功！");
-                        localStorage.setItem("flag",data.flag);
-                        localStorage.setItem("username",data.username);
+                        sessionStorage.setItem("flag",data.flag);
+                        sessionStorage.setItem("username",data.username);
                         window.location.href="./";
                     }else if(data.flag==="Failure1"){
                         alert("登录失败：密码错误");
