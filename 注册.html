@@ -194,8 +194,8 @@
                 <!-- <span class="form_span">选择注册方式</span> -->
                 <input type="text" class="form_input" placeholder="name" name="name">
                 <!-- <input type="text" class="form_input" placeholder="email"> -->
-                <input type="text" class="form_input" placeholder="password" name="password">
-                <input type="text" class="form_input" placeholder="check password" name="check password">
+                <input type="password" class="form_input" placeholder="password" name="password">
+                <input type="password" class="form_input" placeholder="check password" name="check password">
                 <button class=" button" type="submit">SIGN UP</button>
             </form>
         </div>
@@ -205,9 +205,68 @@
             <div class="switch_container" id="switch-c1">
                 <h2 class="switch_title title" style="letter-spacing: 0;">Welcome Back !</h2>
                 <p class="switch_description description">已经有账号了? 欢迎登录！</p>
-                <button class="switch_button button switch-btn"><a class="link" href="./login.html" target="_blank">SIGN IN</a></button>
+                <button class="switch_button button switch-btn"><a class="link" href="./login" target="_blank">SIGN IN</a></button>
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let passwordInput = document.querySelector('input[name="password"]');
+            let checkPasswordInput = document.querySelector('input[name="check password"]');
+            let submitButton = document.querySelector('button[type="submit"]');
+            let form = document.getElementById("a-form");
+            let nameInput = document.querySelector('input[name="name"]');
+    
+            // 创建一个提示信息的 span 元素
+            let errorMessage = document.createElement("span");
+            errorMessage.style.color = "red";
+            errorMessage.style.fontSize = "12px";
+            errorMessage.style.marginTop = "5px";
+            checkPasswordInput.parentNode.insertBefore(errorMessage, checkPasswordInput.nextSibling);
+    
+            function validatePasswords() {
+                if (passwordInput.value !== checkPasswordInput.value) {
+                    errorMessage.textContent = "两次输入的密码不一致";
+                    submitButton.disabled = true; // 禁用提交按钮
+                } else {
+                    errorMessage.textContent = ""; // 清除错误信息
+                    submitButton.disabled = false; // 允许提交
+                }
+            }
+    
+            // 监听输入框的输入事件，实时检查
+            passwordInput.addEventListener("input", validatePasswords);
+            checkPasswordInput.addEventListener("input", validatePasswords);
+
+            form.addEventListener("submit",function(event) {
+                event.preventDefault();
+                let formData = new FormData(form);
+
+                fetch("/register",{
+                    method:"POST",
+                    body:formData
+                })
+                .then(response=>response.text())
+                .then(data=>{
+                    if(data.trim()==="Success"){
+                        alert("注册成功！");
+                        window.location.href="./login";
+                    }else if(data.trim()==="Failure"){
+                        alert("注册失败：用户名已存在");
+                        window.location.reload();
+                    }else{
+                        alert("未知错误，请稍后重试！");
+                        window.location.reload();
+                    }
+                })
+                .catch(error=>{
+                    alert("请求失败，请稍后重试！");
+                    console.error("注册失败：",error);
+                    window.location.reload();
+                });
+            });
+        });
+    </script>
+        
 </body>
 </html>
