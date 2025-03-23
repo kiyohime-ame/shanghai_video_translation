@@ -209,20 +209,20 @@
         </div>
 
         <div class="upload-section">
-            <label for="fileInput" class="custom-file-label">选择文件</label>
+            <label for="fileInput" class="custom-file-label">上传视频</label>
             <input type="file" id="fileInput"  onchange="uploadFile()">
             <!-- <button onclick="uploadFile()">上传</button> -->
             <input type="text" class="search-box" placeholder="搜索文件...">
         </div>
         <div class="file-list" id="content-area">
-            <!-- <h3>我的文件</h3>
-            <p>这里显示最近上传的文件列表。</p> -->
             <ul id="fileList"></ul>
         </div>
     </div>
 
     <script>
         function changeContent(section) {
+            const flag = localStorage.getItem("flag");
+            const username = localStorage.getItem("username");
             let contentArea = document.getElementById("content-area");
             let sidebarItems = document.querySelectorAll(".sidebar ul li");
             
@@ -248,10 +248,6 @@
         function uploadFile() {
             let fileInput = document.getElementById("fileInput");
             let fileList = document.getElementById("fileList");
-            if(!fileList){
-                console.error("错误");
-                return;
-            }
 
             if (fileInput.files.length === 0) {
                 // alert("请选择一个文件！");
@@ -285,14 +281,19 @@
             listItem.remove();
         }
         // 模拟用户登录状态
-        let isLoggedIn = false; // true 表示已登录，false 表示未登录
-        let username = "小明";  // 假设登录后会有用户名
+        // let isLoggedIn = false; // true 表示已登录，false 表示未登录
+        // let username = "小明";  // 假设登录后会有用户名
 
         function updateUserUI() {
             let authButtons = document.getElementById("auth-buttons"); // 登录/注册按钮
             let userInfo = document.getElementById("user-info"); // 显示用户名的区域
             let contentArea = document.getElementById("content-area");
 
+            if (flag==="Success"){
+                let isLoggedIn = true;
+            }else{
+                let isLoggedIn = false;
+            }
             if (isLoggedIn) {
                 authButtons.style.display = "none"; // 隐藏登录/注册
                 userInfo.innerHTML = `<h2>欢迎，${username}</h2>`;

@@ -87,7 +87,22 @@
             border-radius: 8px;
             box-shadow:  2px 2px 4px #d1d9e6, -2px -2px 4px #f9f9f9;
         }
-        
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+            display: none;
+        }
+        .input-container{
+            position: relative;
+            /* display: flex; */
+            align-items: center;
+            width: 350px;
+        }
+        .input-info{
+            /* position: absolute; */
+            left: 10px;
+            font-size: 12px;
+            color: #666;
+        }
         .link{
             color: #f9f9f9;
             font-size: 15px;
@@ -191,11 +206,14 @@
         <div class="container b-container" id="b-container" >
             <form action="" method="post" class="form" id="b-form">
                 <h2 class="form_title title">登录账号</h2>
-                <!-- <span class="form_span">选择登录方式</span> -->
-                <input type="text" class="form_input" placeholder="name" name="name">
-                <!-- <input type="text" class="form_input" placeholder="email"> -->
-                <input type="text" class="form_input" placeholder="password" name="password">
-                <!-- <a  class="form_link">忘记密码？</a> -->
+                <div class="input-container">
+                    <span class="input-info">用户名</span>
+                    <input type="text" class="form_input" placeholder="name" name="name">
+                </div>
+                <div class="input-container">
+                    <span class="input-info">密码</span>
+                    <input type="password" class="form_input" placeholder="password" name="password" required>
+                </div>
                 <button class="form_button button submit">SIGN IN</button>
             </form>
         </div>
@@ -205,9 +223,48 @@
             <div class="switch_container " id="switch-c2">
                 <h2 class="switch_title title" style="letter-spacing: 0;">Hello Friend !</h2>
                 <p class="switch_description description">还没有账号？ 去注册一个吧！</p>
-                <button class="switch_button button switch-btn"><a class="link" href="./register.html" target="_blank">SIGN UP</a></button>
+                <button class="switch_button button switch-btn"><a class="link" href="./register" target="_blank">SIGN UP</a></button>
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let passwordInput = document.querySelector('input[name="password"]');
+            let checkPasswordInput = document.querySelector('input[name="check password"]');
+            let submitButton = document.querySelector('button[type="submit"]');
+            let form = document.getElementById("b-form");
+
+
+            form.addEventListener("submit",function(event) {
+                event.preventDefault();
+                let formData = new FormData(form);
+
+                fetch("/login",{
+                    method:"POST",
+                    body:formData
+                })
+                .then(response=>response.json())
+                .then(data=>{
+                    if(data.flag==="Success"){
+                        alert("登录成功！");
+                        localStorage.setItem("flag",data.flag);
+                        localStorage.setItem("username",data.username);
+                        window.location.href="./main";
+                    }else if(data.flag==="Failure1"){
+                        alert("登录失败：密码错误");
+                        window.location.reload();
+                    }else if(data.flag==="Failure2"){
+                        alert("用户名不存在！");
+                        window.location.reload();
+                    }
+                })
+                .catch(error=>{
+                    alert("请求失败，请稍后重试！");
+                    console.error("注册失败：",error);
+                    window.location.reload();
+                });
+            });
+        });
+    </script>
 </body>
 </html>
