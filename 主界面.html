@@ -225,6 +225,13 @@
         function changeContent(section) {
             let contentArea = document.getElementById("content-area");
             let sidebarItems = document.querySelectorAll(".sidebar ul li");
+            let isLoggedIn = false;
+
+            if (flag==="Success"){
+                isLoggedIn = true;
+            }else{
+                isLoggedIn = false;
+            }
             
             if(!isLoggedIn){
                 contentArea.innerHTML='<h3>请登录后查看内容</h3><p>您需要登录才能访问文件列表</p>'
