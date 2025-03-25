@@ -256,7 +256,14 @@
         const fileList = document.getElementById("fileList");
         function uploadFile() {
             const file = fileInput.files[0];
-            if (!file) return alert("请选择文件");
+            if (!file) {
+                 alert("请选择文件");
+                 return;
+            }
+            if(file.type!=="video/mp4"){
+                alert("只能上传MP4视频文件！")
+                return;
+            }
             const formData = new FormData();
             formData.append("file",file);
             formData.append("filename",file.name);
@@ -267,8 +274,11 @@
             })
             .then(response=>response.json())
             .then(data=>{
-                alert(data.message);
-                loadFiles();
+                if(data.flag==="Success"){
+                    window.location.href='edit?file=${encodeURIComponent(data.file_path)}';
+                }else{
+                    alert("上传失败！");
+                }
             })
             .catch(error => console.error("上传失败",error));
         }
