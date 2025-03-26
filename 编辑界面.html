@@ -366,7 +366,8 @@
         window.onload =function(){
             const filePath = getQueryParam("file");
             if(filePath){
-                document.getElementById("videoSource").src="{{ url_for('static', filename=filePath) }}";
+                document.getElementById("videoSource").src=filePath;
+                console.log(document.getElementById("videoSource").src)
                 document.getElementById("video").load();
             }else{
                 alert("未找到视频文件！");
