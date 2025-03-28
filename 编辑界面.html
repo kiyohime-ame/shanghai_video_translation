@@ -11,7 +11,7 @@
         .nav { width: 200px; background-color: #333; color: white; padding: 20px; }
         .nav button { display: block; margin-bottom: 10px; width: 100%; padding: 10px; cursor: pointer; }
         .content { display: flex; flex: 1; padding: 20px; }
-        .content-left { flex: 1; background-color: #f4f4f4; padding: 20px; margin-right: 10px; }
+        .content-left { flex: 1; background-color: #f4f4f4; padding: 20px; margin-right: 10px; overflow-y: auto; max-height: 491px;}
         .content-right { flex: 1.5; background-color: #ddd; padding: 20px; display: flex; align-items: center; justify-content: center; }
         video { width: 100%; max-height: 100%; }
         
@@ -155,6 +155,22 @@
             width: 80px; /* 缩小音量调节滑动条 */
             margin-right: 10px;
         }
+        #subtitle {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            /* background: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px; */
+            font-size: 18px;
+            text-shadow: 2px 2px 4px black;
+            border-radius: 5px;
+            text-align: center;
+            max-width: 100%;
+            ransition: background 0.2s ease-in-out; /* 平滑过渡背景 */
+            /* z-index: 100; */
+        }
     </style>
 </head>
 <body>
@@ -166,12 +182,14 @@
             <button onclick="changeContent('选项3内容')">选项3</button>
         </nav>
         <div class="content">
-            <div class="content-left" id="left-content">字幕文本</div>
+            <div class="content-left" id="left-content"><pre id="subtitleText">加载字幕中...</pre></div>
             <div class="content-right">
                 <video id="video">
                     <source id="videoSource" src="" type="video/mp4">
+                    <track id="subtitleTrack" label="字幕" kind="subtitles" srclang="zh" src="" default>
                     您的浏览器不支持 HTML5 视频
                 </video>
+                <div id="subtitle"></div>
             </div>
         </div>
     </div>
@@ -363,8 +381,13 @@
             const params =new URLSearchParams(window.location.search);
             return params.get(name);
         }
+        function convertSrtToVtt(srtText) {
+            return "WEBVTT\n\n" + srtText.replace(/,/g, ".");
+        }
         window.onload =function(){
             const filePath = getQueryParam("file");
+            const subtitlePath = getQueryParam("subtitle");
+            const subtitleDiv = document.getElementById("subtitle");
             if(filePath){
                 document.getElementById("videoSource").src=filePath;
                 console.log(document.getElementById("videoSource").src)
@@ -372,6 +395,33 @@
             }else{
                 alert("未找到视频文件！");
             }
+            if (subtitlePath) {
+                fetch(subtitlePath)
+                    .then(response => response.text())
+                    .then(srtText => {
+                        // document.getElementById("subtitleText").textContent = srtText;
+                        changeContent('字幕文本');
+                        const vttText = convertSrtToVtt(srtText);
+                        const vttBlob = new Blob([vttText], { type: "text/vtt" });
+                        const vttUrl = URL.createObjectURL(vttBlob);
+                        document.getElementById("subtitleTrack").src = vttUrl;
+                    })
+                    .catch(error => console.error("字幕加载失败", error));
+            }
+            video.textTracks[0].mode = "hidden"; // 关闭默认字幕
+            const track = video.textTracks[0];
+
+            track.addEventListener("cuechange", function () {
+                if (track.activeCues.length > 0) {
+                    subtitleDiv.textContent = track.activeCues[0].text;
+                    subtitleDiv.style.background = "rgba(0, 0, 0, 0.6)"; // 有字幕时，显示半透明背景
+                    subtitleDiv.style.padding = "5px 10px"; // 适当增加内边距
+                } else {
+                    subtitleDiv.textContent = "";
+                    subtitleDiv.style.background = "transparent"; // 无字幕时，背景透明
+                    subtitleDiv.style.padding = "0"; // 移除内边距，避免占用空间
+                }
+            });
         }
         // 倍速调节
         speedControl.addEventListener("change", () => {
@@ -385,7 +435,17 @@
 
         // 切换左侧内容
         function changeContent(text) {
-            document.getElementById("left-content").innerText = text;
+            if (text === "字幕文本") {
+                const subtitlePath = "./CHS 青之箱 EP01_Netflix.srt";
+                fetch(subtitlePath)
+                    .then(response => response.text())
+                    .then(srtText => {
+                        document.getElementById("left-content").innerText = srtText;
+                    })
+                    .catch(error => console.error("字幕加载失败", error));
+            } else {
+                document.getElementById("left-content").innerText = text;
+            }
         }
     </script>
 

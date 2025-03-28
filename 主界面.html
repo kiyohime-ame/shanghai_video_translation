@@ -275,7 +275,7 @@
             .then(response=>response.json())
             .then(data=>{
                 if(data.flag==="Success"){
-                    window.location.href=`edit?file=${encodeURIComponent(data.file_path)}`;
+                    window.location.href = `edit.html?file=${encodeURIComponent(data.file_path)}&subtitle=${encodeURIComponent(data.subtitle_path)}`;
                 }else{
                     alert("上传失败！");
                 }
