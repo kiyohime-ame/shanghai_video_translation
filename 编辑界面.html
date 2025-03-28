@@ -436,7 +436,7 @@
         // 切换左侧内容
         function changeContent(text) {
             if (text === "字幕文本") {
-                const subtitlePath = "./CHS 青之箱 EP01_Netflix.srt";
+                const subtitlePath = getQueryParam("subtitle");
                 fetch(subtitlePath)
                     .then(response => response.text())
                     .then(srtText => {
