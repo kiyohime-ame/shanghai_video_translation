@@ -275,7 +275,16 @@
             .then(response=>response.json())
             .then(data=>{
                 if(data.flag==="Success"){
-                    window.location.href = `edit?file=${encodeURIComponent(data.file_path)}&subtitle=${encodeURIComponent(data.subtitle_path)}`;
+                    // 创建文件链接
+                    alert("上传成功！");
+                    const li = document.createElement("li");
+                    const link = document.createElement("a");
+                    link.href = `edit?file=${encodeURIComponent(data.file_path)}&subtitle=${encodeURIComponent(data.subtitle_path)}`;
+                    link.textContent = `编辑 ${file.name}`;
+                    link.target = "_blank";  // 在新标签页打开
+                    li.appendChild(link);
+                    fileList.appendChild(li);
+                    // window.location.href = `edit?file=${encodeURIComponent(data.file_path)}&subtitle=${encodeURIComponent(data.subtitle_path)}`;
                 }else{
                     alert("上传失败！");
                 }
@@ -283,13 +292,17 @@
             .catch(error => console.error("上传失败",error));
         }
         function loadFiles() {
-            fetch("/")  // 让后端提供 /files 接口返回已上传文件信息
+            fetch("/files")  // 让后端提供 /files 接口返回已上传文件信息
                 .then(response => response.json())
                 .then(files => {
                     fileList.innerHTML = "";
                     files.forEach(file => {
                         const li = document.createElement("li");
-                        li.textContent = `文件名: ${file.name}, 大小: ${(file.size / 1024).toFixed(2)} KB`;
+                        const link = document.createElement("a");
+                        link.href = `edit?file=${encodeURIComponent(file.file_path)}&subtitle=${encodeURIComponent(file.subtitle_path)}`;
+                        link.textContent = `编辑 ${file.name}`;
+                        link.target = "_blank";  // 在新标签页打开
+                        li.appendChild(link);
                         fileList.appendChild(li);
                     });
                 })
