@@ -289,6 +289,8 @@
                     li.appendChild(link);
                     fileList.appendChild(li);
                     window.location.href = `edit?file=${encodeURIComponent(data.file_path)}&subtitle=${encodeURIComponent(data.subtitle_path)}`;
+                }else if(data.flag==="Failure"){
+                    alert("文件重复,上传失败！");
                 }else{
                     alert("上传失败！");
                 }
