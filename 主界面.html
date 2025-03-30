@@ -292,7 +292,7 @@
             .catch(error => console.error("上传失败",error));
         }
         function loadFiles() {
-            fetch("/files")  // 让后端提供 /files 接口返回已上传文件信息
+            fetch("/")  // 让后端提供 /files 接口返回已上传文件信息
                 .then(response => response.json())
                 .then(files => {
                     fileList.innerHTML = "";
