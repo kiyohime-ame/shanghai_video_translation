@@ -238,18 +238,22 @@
                 return;
             }
             sidebarItems.forEach(item => item.classList.remove("active"));
-
+            event.target.classList.add("active");
+            let title = "";
             if (section === "recent") {
-                contentArea.innerHTML = `<h3>我的文件</h3><p>这里显示最近上传的文件列表。</p><ul id="fileList"></ul>`;
+                title = "我的文件";
             } else if (section === "myFiles") {
-                contentArea.innerHTML = `<h3>历史记录</h3><p>这里显示你上传过的文件。</p><ul id="fileList"></ul>`;
+                title = "历史记录";
             } else if (section === "favorites") {
-                contentArea.innerHTML = `<h3>收藏文件</h3><p>这里显示你收藏的文件。</p><ul id="fileList"></ul>`;
+                title = "收藏文件";
             } else if (section === "recycle") {
-                contentArea.innerHTML = `<h3>回收站</h3><p>这里存放被删除的文件，可以选择恢复或彻底删除。</p><ul id="fileList"></ul>`;
+                title = "回收站";
             }
 
-            event.target.classList.add("active");
+            contentArea.innerHTML = `<h3>${title}</h3><p>这里显示相关文件。</p><ul id="fileList"></ul>`;
+
+            // **调用 `loadFiles()` 以加载文件列表**
+            loadFiles();
         }
 
         const fileInput = document.getElementById("fileInput");
@@ -284,7 +288,7 @@
                     link.target = "_blank";  // 在新标签页打开
                     li.appendChild(link);
                     fileList.appendChild(li);
-                    // window.location.href = `edit?file=${encodeURIComponent(data.file_path)}&subtitle=${encodeURIComponent(data.subtitle_path)}`;
+                    window.location.href = `edit?file=${encodeURIComponent(data.file_path)}&subtitle=${encodeURIComponent(data.subtitle_path)}`;
                 }else{
                     alert("上传失败！");
                 }
@@ -295,7 +299,16 @@
             fetch(`/upload_record?username=${encodeURIComponent(username)}`)  // 让后端提供 /files 接口返回已上传文件信息
                 .then(response => response.json())
                 .then(files => {
+                    const fileList = document.getElementById("fileList");
+                    if (!fileList) {
+                        console.error("未找到 fileList 元素");
+                        return;
+                    }
                     fileList.innerHTML = "";
+                    if (files.length === 0) {
+                        fileList.innerHTML = "<p>没有上传文件</p>";
+                        return;
+                    }
                     files.forEach(file => {
                         const li = document.createElement("li");
                         const link = document.createElement("a");
@@ -310,7 +323,7 @@
         }
 
         // 页面加载时获取文件列表
-        loadFiles();
+        // loadFiles();
         // 模拟用户登录状态
         // let isLoggedIn = false; // true 表示已登录，false 表示未登录
         // let username = "小明";  // 假设登录后会有用户名
@@ -341,7 +354,6 @@
 
         // 初始检查
         updateUserUI();
-        loadFiles();
 
     </script>
 </body>
