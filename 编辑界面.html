@@ -55,7 +55,7 @@
             border-radius: 5px;
             cursor: grab;
             position: absolute;
-            z-index: 10;
+            z-index: 5;
         }
         .segment:active{
             cursor: grabbing;
@@ -67,7 +67,7 @@
             background-color: #ddd;
             cursor: ew-resize;
             border-radius: 5px;
-            z-index: 20;
+            z-index: 7;
         }
         .resize-handle.left{ left: 0;}
         .resize-handle.right{ right: 0;}
@@ -108,7 +108,7 @@
             background-color: red;
             transform: translateX(-50%);
             transition: left 0.1s ease-out;
-            z-index: 100;
+            z-index: 8;
         }
 
 
@@ -173,6 +173,52 @@
             ransition: background 0.2s ease-in-out; /* 平滑过渡背景 */
             /* z-index: 100; */
         }
+        .loading{
+            position: absolute;
+            width: 25vh;
+            height: 25vh;
+            border: 5px solid #000;
+            border-top-color: rgba(0, 0, 0, 0.2);
+            border-right-color: rgba(0, 0, 0, 0.2);
+            border-bottom-color: rgba(0, 0, 0, 0.2);
+            border-radius: 100%;
+            animation: circle infinite 0.75s linear;
+            z-index: 10;
+        }
+        @keyframes circle{
+            0%{
+                transform: rotate(0);
+            }
+            100%{
+                transform: rotate(360deg);
+            }
+        }
+        .loading-text{
+            position: absolute;
+            font-size: large;
+        }
+        .loading-back{
+            background-color: white;
+            position:absolute;
+            width: 45vw;
+            height: 50vh;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .loading-content{
+            background-color: rgba(255, 255, 255, 0.4);;
+            width: 100%;
+            height: 720px;
+            min-height: 100vh;
+            z-index: 10;
+            position: absolute;
+        }
     </style>
 </head>
 <body>
@@ -198,7 +244,12 @@
             </div>
         </div>
     </div>
-
+    <div id="load" class="loading-content" style="display: none;">
+        <div class="loading-back">
+            <div class="loading" ></div>
+            <div class="loading-text">视频生成中</div>
+        </div>
+    </div>
     <footer class="footer">
         <!-- 音量和倍速按钮区域 -->
         <!-- <div class="volume-speed-container">
@@ -554,6 +605,8 @@
             a.click();
         }
         function submitSubtitles() {
+            let load=document.getElementById("load");
+            load.style.display="flex";
             fetch('/new_video', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -574,9 +627,11 @@
                     const a = document.createElement("a");
                     a.href = data.video_url;
                     a.download = "processed_video.mp4";
+                    load.style.display="none";
                     a.click();
                 } else {
                     alert("处理失败，请重试。");
+                    load.style.display="none";
                 }
             })
             .catch(error => console.error("提交失败", error));

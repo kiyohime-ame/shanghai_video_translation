@@ -185,7 +185,52 @@
         .file-info .action:hover {
             color: #357abd;
         }
-
+        .loading{
+            position: absolute;
+            width: 25vh;
+            height: 25vh;
+            border: 5px solid #000;
+            border-top-color: rgba(0, 0, 0, 0.2);
+            border-right-color: rgba(0, 0, 0, 0.2);
+            border-bottom-color: rgba(0, 0, 0, 0.2);
+            border-radius: 100%;
+            animation: circle infinite 0.75s linear;
+            z-index: 10;
+        }
+        @keyframes circle{
+            0%{
+                transform: rotate(0);
+            }
+            100%{
+                transform: rotate(360deg);
+            }
+        }
+        .loading-text{
+            position: absolute;
+            font-size: large;
+        }
+        .loading-back{
+            background-color: white;
+            position:absolute;
+            width: 45vw;
+            height: 50vh;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .loading-content{
+            background-color: rgba(255, 255, 255, 0.4);;
+            width: 100%;
+            height: 720px;
+            min-height: 100vh;
+            z-index: 10;
+            position: absolute;
+        }
     </style>
 </head>
 <body>
@@ -216,6 +261,12 @@
         </div>
         <div class="file-list" id="content-area">
             <ul id="fileList"></ul>
+        </div>
+    </div>
+    <div id="load" class="loading-content" style="display: none;">
+        <div class="loading-back">
+            <div class="loading" ></div>
+            <div class="loading-text">字幕生成中</div>
         </div>
     </div>
 
@@ -272,6 +323,8 @@
             formData.append("file",file);
             formData.append("filename",file.name);
             formData.append("username",username);
+            let load=document.getElementById("load");
+            load.style.display="flex";
             fetch("/",{
                 method:"POST",
                 body:formData
@@ -281,6 +334,7 @@
                 if(data.flag==="Success"){
                     // 创建文件链接
                     alert("上传成功！");
+                    load.style.display="none";
                     const li = document.createElement("li");
                     const link = document.createElement("a");
                     link.href = `edit?file=${encodeURIComponent(data.file_path)}&subtitle=${encodeURIComponent(data.subtitle_path)}`;
@@ -288,11 +342,13 @@
                     link.target = "_blank";  // 在新标签页打开
                     li.appendChild(link);
                     fileList.appendChild(li);
-                    window.location.href = `edit?file=${encodeURIComponent(data.file_path)}&subtitle=${encodeURIComponent(data.subtitle_path)}`;
+                    // window.location.href = `edit?file=${encodeURIComponent(data.file_path)}&subtitle=${encodeURIComponent(data.subtitle_path)}`;
                 }else if(data.flag==="Failure"){
                     alert("文件重复,上传失败！");
+                    load.style.display="none";
                 }else{
                     alert("上传失败！");
+                    load.style.display="none";
                 }
             })
             .catch(error => console.error("上传失败",error));
