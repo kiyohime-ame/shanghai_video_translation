@@ -333,8 +333,8 @@
             .then(data=>{
                 if(data.flag==="Success"){
                     // 创建文件链接
-                    alert("上传成功！");
                     load.style.display="none";
+                    alert("字幕生成完毕！");
                     const li = document.createElement("li");
                     const link = document.createElement("a");
                     link.href = `edit?file=${encodeURIComponent(data.file_path)}&subtitle=${encodeURIComponent(data.subtitle_path)}`;
