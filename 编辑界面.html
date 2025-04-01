@@ -182,6 +182,7 @@
             <button onclick="changeContent('字幕文本')">字幕文本</button>
             <button onclick="changeContent('字幕样式')">字幕样式</button>
             <button onclick="saveVTT()">保存字幕</button>
+            <button onclick="submitSubtitles()">下载视频</button>
         </nav>
         <div class="content">
             <div class="content-left" id="left-content">
@@ -551,6 +552,34 @@
             a.href = URL.createObjectURL(blob);
             a.download = "subtitles.vtt";
             a.click();
+        }
+        function submitSubtitles() {
+            fetch('/new_video', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    srt: editedSubtitles, 
+                    styles: subtitleStyles,
+                    subtitlePath: getQueryParam("subtitle"),
+                    videoPath: getQueryParam("file") })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // alert("字幕已提交，处理后可下载。");
+                    // const downloadLink = document.getElementById("download-link");
+                    // downloadLink.href = data.video_url;
+                    // downloadLink.style.display = "block";
+                    // downloadLink.innerText = "下载处理后的视频";
+                    const a = document.createElement("a");
+                    a.href = data.video_url;
+                    a.download = "processed_video.mp4";
+                    a.click();
+                } else {
+                    alert("处理失败，请重试。");
+                }
+            })
+            .catch(error => console.error("提交失败", error));
         }
         // 倍速调节
         speedControl.addEventListener("change", () => {
