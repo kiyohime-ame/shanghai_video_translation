@@ -531,8 +531,11 @@
             })
             .then(response => response.json())
             .then(data => {
-                alert(data.message);
-                loadFavoriteFiles();  // 重新加载收藏列表
+                if (data.flag === "Success") {
+                    loadFavoriteFiles();
+                } else {
+                    alert("取消收藏失败！");
+                }
             })
             .catch(error => console.error("取消收藏失败", error));
         }
