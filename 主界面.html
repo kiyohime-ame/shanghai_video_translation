@@ -486,7 +486,7 @@
                 authButtons.style.display = "none"; // 隐藏登录/注册
                 userInfo.innerHTML = `<h2>欢迎，${username}</h2>`;
                 userInfo.style.display = "block"; // 显示用户名
-                contentArea.innerHTML = `<h3>我的文件</h3><p>这里显示最近上传的文件列表。</p><ul id="fileList"></ul>`;
+                contentArea.innerHTML = `<h3>我的文件</h3><ul id="fileList"></ul>`;
                 loadFiles();
             } else {
                 authButtons.style.display = "flex"; // 显示登录/注册
