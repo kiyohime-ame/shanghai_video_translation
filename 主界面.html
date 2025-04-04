@@ -239,8 +239,7 @@
         <ul>
             <h2>沪语视频字幕生成</h2>
             <li onclick="changeContent('recent')" class="active">我的文件</li>
-            <!-- <li onclick="changeContent('myFiles')">历史记录</li> -->
-            <li onclick="changeContent('favorites')">收藏文件</li>
+            <li onclick="changeContent('favorites')">我的收藏</li>
             <li onclick="changeContent('community')">社区</li>
         </ul>
     </div>
@@ -311,10 +310,10 @@
                 contentArea.innerHTML = `<h3>${title}</h3><ul id="fileList"></ul>`;
                 // **调用 `loadFiles()` 以加载文件列表**
                 loadFiles();
-            } else if (section === "myFiles") {
-                title = "历史记录";
             } else if (section === "favorites") {
                 title = "收藏文件";
+                contentArea.innerHTML = `<h3>${title}</h3><ul id="fileList"></ul>`;
+                loadFavoriteFiles();
             } else if (section === "community") {
                 title = "社区文件";
                 contentArea.innerHTML = `<h3>${title}</h3><ul id="fileList"></ul>`;
@@ -443,12 +442,70 @@
                         const viewButton = document.createElement("button");
                         viewButton.textContent = `查看 ${file.name}`;
                         viewButton.onclick = () => openVideoModal(file.file_path);
+                        // “收藏”按钮
+                        const favoriteButton = document.createElement("button");
+                        favoriteButton.textContent = "收藏";
+                        favoriteButton.onclick = () => favoriteFile(file.name);
+
+                        li.appendChild(viewButton);
+                        li.appendChild(favoriteButton);
+                        fileList.appendChild(li);
+                    });
+                })
+                .catch(error => console.error("加载社区文件失败", error));
+        }
+
+        function favoriteFile(fileName) {//收藏文件
+            if (!username) {
+                alert("请先登录");
+                return;
+            }
+            fetch("/change_favorite", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ username:username, filename: fileName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.flag === "Success") {
+                    window.location.reload();
+                } else {
+                    alert("收藏失败！");
+                }
+            })
+            .catch(error => console.error("收藏失败", error));
+        }
+        function loadFavoriteFiles() {
+            if (!username) {
+                alert("请先登录");
+                return;
+            }
+            fetch(`/fetch_favorite?username=${encodeURIComponent(username)}`)
+                .then(response => response.json())
+                .then(files => {
+                    const fileList = document.getElementById("fileList");
+                    fileList.innerHTML = "";
+
+                    if (files.length === 0) {
+                        fileList.innerHTML = "<p>你还没有收藏任何文件</p>";
+                        return;
+                    }
+
+                    files.forEach(file => {
+                        const li = document.createElement("li");
+
+                        // “查看”按钮
+                        const viewButton = document.createElement("button");
+                        viewButton.textContent = `查看 ${file.name}`;
+                        viewButton.onclick = () => openVideoModal(file.file_path);
 
                         li.appendChild(viewButton);
                         fileList.appendChild(li);
                     });
                 })
-                .catch(error => console.error("加载社区文件失败", error));
+                .catch(error => console.error("加载收藏文件失败", error));
         }
 
         function openVideoModal(filePath) {//查看视频
