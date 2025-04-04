@@ -368,14 +368,7 @@
                     files.forEach(file => {
                         const li = document.createElement("li");
                         const link = document.createElement("a");
-                        link.href = `edit?file=${encodeURIComponent(file.file_path)}
-                        &subtitle=${encodeURIComponent(file.subtitle_path)}
-                        &color=${encodeURIComponent(file.color)}
-                        &font_size=${encodeURIComponent(file.font_size)}
-                        &font_family=${encodeURIComponent(file.font_family)}
-                        &bold=${encodeURIComponent(file.bold)}
-                        &italic=${encodeURIComponent(file.italic)}
-                        &underline=${encodeURIComponent(file.underline)}`;
+                        link.href = `edit?file=${encodeURIComponent(file.file_path)}&subtitle=${encodeURIComponent(file.subtitle_path)}&color=${encodeURIComponent(file.color)}&font_size=${encodeURIComponent(file.font_size)}&font_family=${encodeURIComponent(file.font_family)}&bold=${encodeURIComponent(file.bold)}&italic=${encodeURIComponent(file.italic)}&underline=${encodeURIComponent(file.underline)}`;
                         link.textContent = `编辑 ${file.name}`;
                         link.target = "_blank";  // 在新标签页打开
                         
