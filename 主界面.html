@@ -21,7 +21,6 @@
             width: 250px;
             background: #e3ecfb;
             padding: 20px;
-            /* margin-top: 10%; */
         }
         .sidebar ul {
             list-style: none;
@@ -88,9 +87,6 @@
             display: flex;
             align-items: center;
         }
-        /* .upload-section input {
-            display: none;
-        } */
          #fileInput{
             display: none;
          }
@@ -238,7 +234,7 @@
     <div class="sidebar">
         <ul>
             <h2>沪语视频字幕生成</h2>
-            <li onclick="changeContent('recent')" class="active">我的文件</li>
+            <li onclick="changeContent('file')" class="active">我的文件</li>
             <li onclick="changeContent('favorites')">我的收藏</li>
             <li onclick="changeContent('community')">社区</li>
         </ul>
@@ -256,7 +252,6 @@
         <div class="upload-section">
             <label for="fileInput" class="custom-file-label">上传视频</label>
             <input type="file" id="fileInput"  onchange="uploadFile()">
-            <!-- <button onclick="uploadFile()">上传</button> -->
             <input type="text" class="search-box" placeholder="搜索文件...">
         </div>
         <div class="file-list" id="content-area">
@@ -279,7 +274,6 @@
             </video>
         </div>
     </div>
-
 
     <script>
         const flag = sessionStorage.getItem("flag");
@@ -305,10 +299,9 @@
             sidebarItems.forEach(item => item.classList.remove("active"));
             event.target.classList.add("active");
             let title = "";
-            if (section === "recent") {
+            if (section === "file") {
                 title = "我的文件";
-                contentArea.innerHTML = `<h3>${title}</h3><ul id="fileList"></ul>`;
-                // **调用 `loadFiles()` 以加载文件列表**
+                contentArea.innerHTML = `<h3>${title}</h3><ul id="fileList"></ul>`;// **调用 `loadFiles()` 以加载文件列表**
                 loadFiles();
             } else if (section === "favorites") {
                 title = "收藏文件";
@@ -319,7 +312,6 @@
                 contentArea.innerHTML = `<h3>${title}</h3><ul id="fileList"></ul>`;
                 loadCommunityFiles();
             }
-
         }
 
         function uploadFile() {//文件上传
@@ -347,14 +339,6 @@
                 if(data.flag==="Success"){
                     // 创建文件链接
                     load.style.display="none";
-                    alert("字幕生成完毕！");
-                    const li = document.createElement("li");
-                    const link = document.createElement("a");
-                    link.href = `edit?file=${encodeURIComponent(data.file_path)}&subtitle=${encodeURIComponent(data.subtitle_path)}`;
-                    link.textContent = `编辑 ${file.name}`;
-                    link.target = "_blank";  // 在新标签页打开
-                    li.appendChild(link);
-                    fileList.appendChild(li);
                     window.location.reload();
                     // window.location.href = `edit?file=${encodeURIComponent(data.file_path)}&subtitle=${encodeURIComponent(data.subtitle_path)}`;
                 }else if(data.flag==="Failure"){
@@ -384,7 +368,13 @@
                     files.forEach(file => {
                         const li = document.createElement("li");
                         const link = document.createElement("a");
-                        link.href = `edit?file=${encodeURIComponent(file.file_path)}&subtitle=${encodeURIComponent(file.subtitle_path)}&font_size=${encodeURIComponent(file.font_size)}&color=${encodeURIComponent(file.color)}`;
+                        link.href = `edit?file=${encodeURIComponent(file.file_path)}
+                        &subtitle=${encodeURIComponent(file.subtitle_path)}
+                        &font_size=${encodeURIComponent(file.font_size)}
+                        &font_family=${encodeURIComponent(file.font_family)}
+                        &bold=${encodeURIComponent(file.bold)}
+                        &italic=${encodeURIComponent(file.italic)}
+                        &underline=${encodeURIComponent(file.underline)}`;
                         link.textContent = `编辑 ${file.name}`;
                         link.target = "_blank";  // 在新标签页打开
                         

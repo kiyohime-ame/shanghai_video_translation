@@ -130,7 +130,6 @@
             text-align: center;
             max-width: 100%;
             ransition: background 0.2s ease-in-out; /* 平滑过渡背景 */
-            /* z-index: 100; */
         }
         .loading{
             position: absolute;
@@ -217,10 +216,6 @@
             <span id="totalTime">--:--</span>
         </div>
 
-        <!-- 进度条 -->
-        <!-- <div class="timeline-container">
-            <input type="range" id="timeline" min="0" value="0">
-        </div> -->
         <div class="timeline-container">
             <div class="track">
             </div>
@@ -234,8 +229,6 @@
         const video = document.getElementById("video");
         const timeline = document.getElementById("timeline");
         const playPauseBtn = document.getElementById("playPauseBtn");
-        const speedControl = document.getElementById("speedControl");
-        const volumeControl = document.getElementById("volumeControl");
         const currentTimeDisplay = document.getElementById("currentTime");
         const totalTimeDisplay = document.getElementById("totalTime");
         const currentTimeIndicator = document.querySelector(".current-time-indicator");
@@ -296,7 +289,10 @@
         let subtitleStyles = {
             fontSize: getQueryParam("font_size"),
             color: getQueryParam("color"),
-            fontFamily: "Arial, sans-serif"
+            fontFamily: getQueryParam("font_family"),
+            bold:getQueryParam("bold"),
+            italic:getQueryParam("italic"),
+            underline:getQueryParam("underline")
         };
 
         function convertSrtToVtt(srtText) {
@@ -400,32 +396,48 @@
             leftContent.innerHTML = `
                 <label>字体大小: <input type="number" id="fontSize" value="${parseInt(subtitleStyles.fontSize)}" min="10" max="100"> px</label><br>
                 <label>颜色: <input type="color" id="fontColor" value="${subtitleStyles.color}"></label><br>
+                <label><input type="checkbox" id="boldCheck"> 粗体</label>
+                <label><input type="checkbox" id="italicCheck"> 斜体</label>
+                <label><input type="checkbox" id="underlineCheck"> 下划线</label><br>
                 <label>字体:
                     <select id="fontFamily">
-                        <option value="Arial, sans-serif">Arial</option>
-                        <option value="Verdana, sans-serif">Verdana</option>
-                        <option value="Times New Roman, serif">Times New Roman</option>
-                        <option value="Courier New, monospace">Courier New</option>
+                        <option value="SimSun">宋体</option>
+                        <option value="SimHei">黑体</option>
+                        <option value="KaiTi">楷体</option>
+                        <option value="FangSong">仿宋</option>
                     </select>
                 </label>
             `;
 
             // 设置当前字体
             document.getElementById("fontFamily").value = subtitleStyles.fontFamily;
+            document.getElementById("boldCheck").checked = subtitleStyles.bold;
+            document.getElementById("italicCheck").checked = subtitleStyles.italic;
+            document.getElementById("underlineCheck").checked = subtitleStyles.underline;
 
             // 监听事件
             document.getElementById("fontSize").addEventListener("input", (e) => {
                 subtitleStyles.fontSize = e.target.value + "px";
                 applySubtitleStyles();
             });
-
             document.getElementById("fontColor").addEventListener("input", (e) => {
                 subtitleStyles.color = e.target.value;
                 applySubtitleStyles();
             });
-
             document.getElementById("fontFamily").addEventListener("change", (e) => {
                 subtitleStyles.fontFamily = e.target.value;
+                applySubtitleStyles();
+            });
+            document.getElementById('boldCheck').addEventListener('change', (e) => {
+                subtitleStyles.bold = e.target.checked;
+                applySubtitleStyles();
+            });
+            document.getElementById('italicCheck').addEventListener('change', (e) => {
+                subtitleStyles.italic = e.target.checked;
+                applySubtitleStyles();
+            });
+            document.getElementById('underlineCheck').addEventListener('change', (e) => {
+                subtitleStyles.underline = e.target.checked;
                 applySubtitleStyles();
             });
         }
@@ -436,7 +448,12 @@
             if (subtitleDiv) {
                 subtitleDiv.style.fontSize = subtitleStyles.fontSize;
                 subtitleDiv.style.color = subtitleStyles.color;
+                subtitleDiv.style.backgroundColor = subtitleStyles.backgroundColor;
                 subtitleDiv.style.fontFamily = subtitleStyles.fontFamily;
+                // 字体样式
+                subtitleDiv.style.fontWeight = subtitleStyles.bold ? 'bold' : 'normal';
+                subtitleDiv.style.fontStyle = subtitleStyles.italic ? 'italic' : 'normal';
+                subtitleDiv.style.textDecoration = subtitleStyles.underline ? 'underline' : 'none';
             }
         }
 
