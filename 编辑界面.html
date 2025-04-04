@@ -319,7 +319,8 @@
                     .then(srtText => {
                         editedSubtitles = srtText; // 先存储
                         displaySubtitleEditor(editedSubtitles);
-                        updateSubtitles(srtText);
+                        updateSubtitles(cleanSubtitleText(srtText));
+                        applySubtitleStyles();
                     })
                     .catch(error => console.error("字幕加载失败", error));
             }
