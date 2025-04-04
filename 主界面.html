@@ -194,7 +194,7 @@
             position: absolute;
         }
                 /* 模态框的背景 */
-                .modal {
+        .modal {
             display: none;
             position: fixed;
             z-index: 1000;
@@ -387,12 +387,21 @@
                         link.href = `edit?file=${encodeURIComponent(file.file_path)}&subtitle=${encodeURIComponent(file.subtitle_path)}&font_size=${encodeURIComponent(file.font_size)}&color=${encodeURIComponent(file.color)}`;
                         link.textContent = `编辑 ${file.name}`;
                         link.target = "_blank";  // 在新标签页打开
-                        //分享按钮
-                        const shareButton = document.createElement("button");
-                        shareButton.textContent = "发布";
-                        shareButton.onclick= () =>shareFile(file.name);
+                        
                         li.appendChild(link);
-                        li.appendChild(shareButton);
+                        
+                        if(file.is_public_flag){
+                            // 取消分享按钮
+                            const shareButton = document.createElement("button");
+                            shareButton.textContent = "取消发布";
+                            shareButton.onclick= () =>shareFile(file.name);
+                            li.appendChild(shareButton);
+                        } else{
+                            const shareButton = document.createElement("button");
+                            shareButton.textContent = "发布";
+                            shareButton.onclick= () =>shareFile(file.name);
+                            li.appendChild(shareButton);
+                        }
                         fileList.appendChild(li);
                     });
                 })
@@ -470,14 +479,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.flag === "Success") {
-                    window.location.reload();
+                    // window.location.reload();
                 } else {
                     alert("收藏失败！");
                 }
             })
             .catch(error => console.error("收藏失败", error));
         }
-        function loadFavoriteFiles() {
+
+        function loadFavoriteFiles() {//加载收藏文件
             if (!username) {
                 alert("请先登录");
                 return;
@@ -501,11 +511,30 @@
                         viewButton.textContent = `查看 ${file.name}`;
                         viewButton.onclick = () => openVideoModal(file.file_path);
 
+                        const unfavButton = document.createElement("button");
+                        unfavButton.textContent = "取消收藏";
+                        unfavButton.onclick = () => unfavoriteFile(file.id);
+
                         li.appendChild(viewButton);
+                        li.appendChild(unfavButton);
                         fileList.appendChild(li);
                     });
                 })
                 .catch(error => console.error("加载收藏文件失败", error));
+        }
+
+        function unfavoriteFile(fileName) {//取消收藏
+            fetch("/cancel_favorite", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username:username, filename: fileName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadFavoriteFiles();  // 重新加载收藏列表
+            })
+            .catch(error => console.error("取消收藏失败", error));
         }
 
         function openVideoModal(filePath) {//查看视频
