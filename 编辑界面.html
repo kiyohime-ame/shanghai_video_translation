@@ -189,9 +189,7 @@
             <button onclick="submitSubtitles()">下载视频</button>
         </nav>
         <div class="content">
-            <div class="content-left" id="left-content">
-                <textarea id="subtitleEditor" style="width: 100%; height: 100%;"></textarea>
-            </div>
+            <div class="content-left" id="left-content"></div>
             <div class="content-right">
                 <video id="video">
                     <source id="videoSource" src="" type="video/mp4">
@@ -380,20 +378,53 @@
 
         function displaySubtitleEditor(subtitleText) {
             const leftContent = document.getElementById("left-content");
-            
-            // 确保左侧显示的是 textarea
-            if (!document.getElementById("subtitleEditor")) {
-                leftContent.innerHTML = '<textarea id="subtitleEditor" style="width: 100%; height: 100%;"></textarea>';
-            }
+            leftContent.innerHTML = ''; // 清空内容区
 
-            const subtitleEditor = document.getElementById("subtitleEditor");
-            subtitleEditor.value = cleanSubtitleText(subtitleText);
+            const subtitles = subtitleText.trim().split(/\n\s*\n/); // 每段字幕以空行分隔
+            const updatedSubtitles = []; // 用于收集用户修改的内容
 
-            // 监听修改，并更新全局变量
-            subtitleEditor.addEventListener("input", () => {
-                editedSubtitles = subtitleEditor.value;
-                updateSubtitles(editedSubtitles); // 更新视频字幕
+            subtitles.forEach((block, index) => {
+                const container = document.createElement('div');
+                container.style.marginBottom = '12px';
+
+                const textarea = document.createElement('textarea');
+                textarea.style.width = '100%';
+                textarea.style.height = '80px';
+                textarea.value = block;
+
+                // 提取开始时间（第二行）
+                const lines = block.split('\n');
+                let startTime = 0;
+                if (lines.length >= 2) {
+                    const timeLine = lines[1];
+                    const match = timeLine.match(/^(\d{2}):(\d{2}):(\d{2}),(\d{3})/);
+                    if (match) {
+                        const [, hh, mm, ss, ms] = match;
+                        startTime = parseInt(hh) * 3600 + parseInt(mm) * 60 + parseInt(ss) + parseInt(ms) / 1000;
+                    }
+                }
+
+                // 在获得焦点时，跳转视频
+                textarea.addEventListener('focus', () => {
+                    if (!isNaN(startTime)) {
+                        video.currentTime = startTime;
+                    }
+                });
+                // 监听用户输入，更新字幕数组和视频字幕
+                textarea.addEventListener('input', () => {
+                    updatedSubtitles[index] = textarea.value;
+                    editedSubtitles = updatedSubtitles.join('\n\n'); // 拼接为完整 SRT
+                    updateSubtitles(editedSubtitles); // 更新视频显示
+                });
+
+                updatedSubtitles[index] = block; // 初始化
+                container.appendChild(textarea);
+                leftContent.appendChild(container);
             });
+
+            // 初始化编辑后的字幕内容
+            editedSubtitles = updatedSubtitles.join('\n\n');
+            updateSubtitles(editedSubtitles);
         }
 
         function displayStyleEditor() {
