@@ -317,9 +317,9 @@
                 fetch(subtitlePath)
                     .then(response => response.text())
                     .then(srtText => {
-                        editedSubtitles = srtText; // 先存储
+                        editedSubtitles = cleanSubtitleText(srtText); // 先存储
                         displaySubtitleEditor(editedSubtitles);
-                        updateSubtitles(cleanSubtitleText(srtText));
+                        updateSubtitles(editedSubtitles);
                         applySubtitleStyles();
                     })
                     .catch(error => console.error("字幕加载失败", error));
