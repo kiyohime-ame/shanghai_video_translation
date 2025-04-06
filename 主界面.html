@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>主界面</title>
-    <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/5.13.0/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -269,9 +269,9 @@
     <div class="sidebar">
         <ul>
             <h2>沪语视频字幕生成</h2>
-            <li onclick="changeContent('recent')" class="active"><i class="fa fa-folder-open">我的文件</i></li>
+            <li onclick="changeContent('file')" class="active"><i class="fa fa-folder-open">我的文件</i></li>
             <li onclick="changeContent('favorites')"><i class="fa fa-star">收藏文件</i></li>
-            <li onclick="changeContent('recycle')"><i class="fa fa-users">社区</i></li>
+            <li onclick="changeContent('community')"><i class="fa fa-users">社区</i></li>
         </ul>
     </div>
     <div class="main-content">
@@ -406,9 +406,9 @@
                         const card = document.createElement("div");
                         card.className = "file-card";
                         const filename = document.createElement("span");
-                        filename.textContent = `${file.filename}`;
+                        filename.textContent = `${file.name}`;
                         const time = document.createElement("span");
-                        time.textContent = `${file.datatime}`;
+                        time.textContent = `${file.datetime}`;
                         link.href = `edit?file=${encodeURIComponent(file.file_path)}&subtitle=${encodeURIComponent(file.subtitle_path)}&color=${encodeURIComponent(file.color)}&font_size=${encodeURIComponent(file.font_size)}&font_family=${encodeURIComponent(file.font_family)}&bold=${encodeURIComponent(file.bold)}&italic=${encodeURIComponent(file.italic)}&underline=${encodeURIComponent(file.underline)}`;
                         link.textContent = `编辑`;
                         link.target = "_blank";  // 在新标签页打开
@@ -421,7 +421,6 @@
                             // 取消分享按钮
                             const shareButton = document.createElement("button");
                             shareButton.className = "button button-danger"
-                            shareButton.textContent = "取消发布";
                             shareButton.onclick= () =>shareFile(file.name);
                             const icon = document.createElement("i");
                             icon.className = "fas fa-reply";
@@ -431,7 +430,6 @@
                         } else{
                             const shareButton = document.createElement("button");
                             shareButton.className = "button button-primary"
-                            shareButton.textContent = "发布";
                             shareButton.onclick= () =>shareFile(file.name);
                             const icon = document.createElement("i");
                             icon.className = "fas fa-share";
