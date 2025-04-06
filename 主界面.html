@@ -157,9 +157,13 @@
             box-shadow: 0 6px 14px rgba(0,0,0,0.1);
         }
         .link{
-            position: relative;
-            left: 15%;
+            position: absolute;
+            left: 75%;
             text-decoration: none;
+        }
+        .time{
+            position: absolute;
+            left: 40%;
         }
         .button {
             padding: 8px 14px;
@@ -408,6 +412,7 @@
                         const filename = document.createElement("span");
                         filename.textContent = `${file.name}`;
                         const time = document.createElement("span");
+                        time.className = "time";
                         time.textContent = `${file.datetime}`;
                         link.href = `edit?file=${encodeURIComponent(file.file_path)}&subtitle=${encodeURIComponent(file.subtitle_path)}&color=${encodeURIComponent(file.color)}&font_size=${encodeURIComponent(file.font_size)}&font_family=${encodeURIComponent(file.font_family)}&bold=${encodeURIComponent(file.bold)}&italic=${encodeURIComponent(file.italic)}&underline=${encodeURIComponent(file.underline)}`;
                         link.textContent = `编辑`;
