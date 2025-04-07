@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>视频编辑页面</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/5.13.0/css/all.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { display: flex; flex-direction: column; height: 100vh; font-family: Arial, sans-serif; }
         .container { display: flex; flex: 3; }
         .nav { width: 200px; background-color: #333; color: white; padding: 20px; }
-        .nav button { display: block; margin-bottom: 10px; width: 100%; padding: 10px; cursor: pointer; }
+        .nav button { display: block; margin-bottom: 10px; width: 100%; padding: 10px; cursor: pointer; border-radius: 5px;}
         .content { display: flex; flex: 1; padding: 20px; }
         .content-left { flex: 1; background-color: #f4f4f4; padding: 20px; margin-right: 10px; overflow-y: auto; max-height: 64.5vh; min-height: 64.5vh;}
         .content-right { flex: 1.5; background-color: #ddd; padding: 20px; display: flex; align-items: center; justify-content: center; position: relative;}
@@ -177,16 +178,112 @@
             z-index: 10;
             position: absolute;
         }
+        textarea{
+            border: none;
+            outline: none;
+            padding: 0;
+            margin: 0;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-color: transparent;
+            font-size: inherit;
+            width: 100%;
+        }
+        textarea:focus{
+            outline: none;
+        }
+        .mo-textarea{
+            display: inline-block;
+            resize: vertical;
+            padding: 5px 15px;
+            line-height: 1.5;
+            box-sizing: border-box;
+            color: #606266;
+            background-color: #fff;
+            border: 2px solid #dcdfe6;
+            border-radius: 4px;
+            transition: border-color 0.2s cubic-bezier(0.645,1.045,0.355,1);
+        }
+        .mo-textarea:hover{
+            border-color: #c0c4cc;
+        }
+        .mo-textarea:focus{
+            border-color: #3677f0;
+        }
+        select{
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding: 8px;
+            border: 1px solid #999;
+            border-radius: 5px;
+            background-color: #f1f1f1;
+            color: #333;
+            font-size: 16px;
+            width: auto;
+        }
+        option{
+            padding: 5px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .biu{
+            background-color: #dcdfe6;
+            /* padding: 10px; */
+            width: max-content;
+            display: flex;
+            /* border:1px solid #000; */
+            border-radius: 10px;
+        }
+        .bc{
+            cursor: pointer;
+            /* background-color: #e3ecfb; */
+            padding: 10px;
+            /* align-items: center;
+            justify-content: center; */
+            border-radius: 10px 0 0 10px;
+        }
+        .bc:hover{
+            background-color: #c0c4cc;
+        }
+        input[type="checkbox"]:checked+.bc{
+            background-color: #c0c4cc;
+        }
+        .ic{
+            cursor: pointer;
+            /* background-color: #e3ecfb; */
+            padding: 10px ;
+        }
+        .ic:hover{
+            background-color: #c0c4cc;
+        }
+        input[type="checkbox"]:checked+.ic{
+            background-color: #c0c4cc;
+        }
+        .uc{
+            cursor: pointer;
+            /* background-color: #e3ecfb; */
+            padding: 10px;
+            border-radius: 0 10px 10px 0;
+
+        }
+        .uc:hover{
+            background-color: #c0c4cc;
+        }
+        input[type="checkbox"]:checked+.uc{
+            background-color: #c0c4cc;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <nav class="nav">
-            <button onclick="changeContent('字幕文本')">字幕文本</button>
-            <button onclick="changeContent('字幕样式')">字幕样式</button>
-            <button onclick="saveVTT()">保存字幕</button>
-            <button onclick="submitSubtitles()">下载视频</button>
+            <button onclick="changeContent('字幕文本')"><i class="fa fa-edit">字幕文本</i></button>
+            <button onclick="changeContent('字幕样式')"><i class="fa fa-cog">字幕样式</i></button>
+            <button onclick="saveVTT()"><i class="fa fa-download">保存字幕</i></button>
+            <button onclick="submitSubtitles()"><i class="fa fa-download">下载视频</i></button>
         </nav>
         <div class="content">
             <div class="content-left" id="left-content"></div>
@@ -386,20 +483,40 @@
             const textareas = []; //保存每个 textarea 引用
 
             subtitles.forEach((block, index) => {
+                const lines = block.split('\n');
+                if (lines.length < 3) return;
+
+                const number = lines[0];
+                const timeLine = lines[1];
+                const textLines = lines.slice(2);
+                const text = textLines.join('\n');
+
                 const container = document.createElement('div');
-                container.style.marginBottom = '12px';
+                container.style.marginBottom = '16px';
+                container.style.border = '1px solid #ccc';
+                container.style.padding = '8px';
+                container.style.borderRadius = '6px';
+                container.style.backgroundColor = '#f9f9f9';
+                // 时间轴显示（只读）
+                const timeDisplay = document.createElement('div');
+                timeDisplay.textContent = timecode;
+                timeDisplay.style.marginBottom = '4px';
+                timeDisplay.style.color = '#222';
+                timeDisplay.style.fontSize = '16px';
+                timeDisplay.style.bold =true;
+                timeDisplay.style.fontFamily = 'monospace';
 
                 const textarea = document.createElement('textarea');
+                textarea.className = "mo-textarea";
                 textarea.style.width = '100%';
-                textarea.style.height = '80px';
-                textarea.value = block;
+                textarea.style.height = '60px';
+                textarea.style.fontSize = '14px'
+                textarea.value = text;
 
                 // 提取时间（第二行）
                 let startTime = 0, endTime = 0;
-                const lines = block.split('\n');
                 let middleTime = 0;
                 if (lines.length >= 2) {
-                    const timeLine = lines[1];
                     const match = timeLine.match(/^(\d{2}):(\d{2}):(\d{2}),(\d{3})\s*--\>\s*(\d{2}):(\d{2}):(\d{2}),(\d{3})$/);
                     if (match) {
                         const [ , sh, sm, ss, sms, eh, em, es, ems ] = match;
@@ -413,12 +530,12 @@
                 textarea.addEventListener('focus', () => {
                     if (!isNaN(middleTime)) {
                         video.currentTime = middleTime;
-                        // console.log(middleTime);
                     }
                 });
                 // 监听用户输入，更新字幕数组和视频字幕
                 textarea.addEventListener('input', () => {
-                    updatedSubtitles[index] = textarea.value;
+                    const updatedBlock = `${number}\n${timecode}\n${textArea.value}`;
+                    updatedSubtitles[index] = updatedBlock;
                     editedSubtitles = updatedSubtitles.join('\n\n'); // 拼接为完整 SRT
                     updateSubtitles(editedSubtitles); // 更新视频显示
                 });
@@ -427,20 +544,9 @@
                 subtitleTimings[index] = { start: startTime, end: endTime };
                 textareas[index] = textarea;
 
+                container.appendChild(timeDisplay);
                 container.appendChild(textarea);
                 leftContent.appendChild(container);
-            });
-            // 监听视频播放进度，高亮当前字幕
-            video.addEventListener('timeupdate', () => {
-                const currentTime = video.currentTime;
-                subtitleTimings.forEach((timing, index) => {
-                    const textarea = textareas[index];
-                    if (currentTime >= timing.start && currentTime <= timing.end) {
-                        textarea.style.backgroundColor = '#ffffcc'; // 高亮
-                    } else {
-                        textarea.style.backgroundColor = ''; // 恢复默认
-                    }
-                });
             });
 
             // 初始化编辑后的字幕内容
@@ -452,11 +558,9 @@
             const leftContent = document.getElementById("left-content");
 
             leftContent.innerHTML = `
-                <label>字体大小: <input type="number" id="fontSize" value="${parseInt(subtitleStyles.fontSize)}" min="10" max="100"> px</label><br>
-                <label>颜色: <input type="color" id="fontColor" value="${subtitleStyles.color}"></label><br>
-                <label><input type="checkbox" id="boldCheck"> 粗体</label>
-                <label><input type="checkbox" id="italicCheck"> 斜体</label>
-                <label><input type="checkbox" id="underlineCheck"> 下划线</label><br>
+                <label>字体大小: <input type="number" id="fontSize" value="${parseInt(subtitleStyles.fontSize)}" min="10" max="100"></label><br>
+                <label>颜色: <input type="color" id="fontColor" value="${subtitleStyles.color}"></label>
+                
                 <label>字体:
                     <select id="fontFamily">
                         <option value="SimSun">宋体</option>
@@ -465,7 +569,16 @@
                         <option value="FangSong">仿宋</option>
                     </select>
                 </label>
+                <div class="biu">
+                    <input type="checkbox" id="boldCheck" checked hidden>
+                    <label for="boldCheck" class="bc"><i class="fa fa-bold"></i></label>
+                    <input type="checkbox" id="italicCheck" checked hidden>
+                    <label for="italicCheck" class="ic"><i class="fa fa-italic"></i></label>
+                    <input type="checkbox" id="underlineCheck" checked hidden>
+                    <label for="underlineCheck" class="uc"><i class="fa fa-underline"></i></label>
+                </div>
             `;
+            leftContent.style.fontSize="20px";
 
             // 设置当前字体
             document.getElementById("fontFamily").value = subtitleStyles.fontFamily;
