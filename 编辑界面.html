@@ -534,7 +534,7 @@
                 });
                 // 监听用户输入，更新字幕数组和视频字幕
                 textarea.addEventListener('input', () => {
-                    const updatedBlock = `${number}\n${timecode}\n${textArea.value}`;
+                    const updatedBlock = `${number}\n${timecode}\n${textarea.value}`;
                     updatedSubtitles[index] = updatedBlock;
                     editedSubtitles = updatedSubtitles.join('\n\n'); // 拼接为完整 SRT
                     updateSubtitles(editedSubtitles); // 更新视频显示
@@ -637,6 +637,21 @@
             vttContent += `::cue {\n  color: ${subtitleStyles.color};\n`;
             vttContent += `  font-size: ${subtitleStyles.fontSize};\n`;
             vttContent += `  font-family: ${subtitleStyles.fontFamily};\n}\n\n`;
+            if(subtitleStyles.bold){
+                vttContent += `::cue(b) {\n  font-weight: bold;\n}\n\n`;
+            } else{
+                vttContent += `::cue(b) {\n  font-weight: none;\n}\n\n`;
+            }
+            if(subtitleStyles.italic){
+                vttContent += `::cue(i) {\n  font-style: italic;\n}\n\n`;
+            } else{
+                vttContent += `::cue(i) {\n  font-weight: none;\n}\n\n`;
+            }
+            if(subtitleStyles.underline){
+                vttContent += `::cue(u) {\n  font-weight: underline;\n}\n\n`;
+            } else{
+                vttContent += `::cue(u) {\n  font-weight: none;\n}\n\n`;
+            }
 
             // 添加字幕内容
             vttContent += convertSrtToVtt(editedSubtitles);  // 假设这里已经是正确的 VTT 格式（时间戳 + 文本）
