@@ -517,7 +517,7 @@
                 let startTime = 0, endTime = 0;
                 let middleTime = 0;
                 if (lines.length >= 2) {
-                    const match = timeLine.match(/^(\d{2}):(\d{2}):(\d{2}),(\d{3})\s*--\>\s*(\d{2}):(\d{2}):(\d{2}),(\d{3})$/);
+                    const match = timecode.match(/^(\d{2}):(\d{2}):(\d{2}),(\d{3})\s*--\>\s*(\d{2}):(\d{2}):(\d{2}),(\d{3})$/);
                     if (match) {
                         const [ , sh, sm, ss, sms, eh, em, es, ems ] = match;
                         startTime = parseInt(sh) * 3600 + parseInt(sm) * 60 + parseInt(ss) + parseInt(sms) / 1000;
